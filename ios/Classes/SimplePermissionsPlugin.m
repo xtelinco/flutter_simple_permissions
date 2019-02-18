@@ -183,10 +183,26 @@
 
 -(void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
 {
-    BOOL success = ( status == kCLAuthorizationStatusAuthorizedAlways ||
-                    (status == kCLAuthorizationStatusAuthorizedWhenInUse && self.whenInUse));
-    if(self.flutterResult) {
-        self.flutterResult( [NSNumber numberWithBool:status] );
+    NSLog(@"Auth change %d", (int)status);
+    if( status != kCLAuthorizationStatusNotDetermined ) {
+        if(self.flutterResult) {
+            if(self.whenInUse) {
+                if(status == kCLAuthorizationStatusAuthorizedWhenInUse ||
+                   status == kCLAuthorizationStatusAuthorizedAlways) {
+                    self.flutterResult(@(3));
+                }else{
+                    self.flutterResult( [NSNumber numberWithInt:(int)status] );
+                }
+            }else{
+                if(status == kCLAuthorizationStatusAuthorizedAlways) {
+                    self.flutterResult(@(3));
+                }else if(status == kCLAuthorizationStatusAuthorizedWhenInUse) {
+                    self.flutterResult(@(1));
+                }else{
+                    self.flutterResult( [NSNumber numberWithInt:(int)status] );
+                }
+            }
+        }
     }
 }
 
